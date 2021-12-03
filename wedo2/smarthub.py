@@ -14,7 +14,8 @@ adapter = None
 
 class Smarthub:
 
-    def __init__(self):
+    # edited based on https://github.com/jannopet/LEGO-WeDo-2.0-Python-SDK/issues/3
+    def __init__(self, dev_addr=None):
         global adapter
         if adapter is None:
             adapter = _Patched_BGAPIBackend()
@@ -24,9 +25,11 @@ class Smarthub:
         self.service_manager = None
         self.device = None
 
-        devices = adapter.scan(1)
-        devices = sorted(devices, key=lambda k: k['rssi'], reverse=True)
-        device_address = devices[0]['address']
+        device_address = dev_addr
+        if device_address is None:
+            devices = adapter.scan(1)
+            devices = sorted(devices, key=lambda k: k['rssi'], reverse=True)
+            device_address = devices[0]['address']
         self.device = adapter.connect(device_address)
         self.io = BluetoothIO(self.device)
         self.service_manager = ServiceManager(self.io)
